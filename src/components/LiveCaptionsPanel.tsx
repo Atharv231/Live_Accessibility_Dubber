@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Mic, MicOff, Brain, Zap } from 'lucide-react';
 
 interface CaptionLine {
   id: string;
@@ -20,70 +20,108 @@ export const LiveCaptionsPanel = ({ isConnected, fontSize }: LiveCaptionsPanelPr
   const [captions, setCaptions] = useState<CaptionLine[]>([]);
   const [isPaused, setIsPaused] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const [currentInterim, setCurrentInterim] = useState<string>('');
+  const [error, setError] = useState<string>('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const captionIdRef = useRef(0);
+  const recognitionRef = useRef<any>(null);
 
-  // Mock live captions data
-  const mockCaptions = [
-    "Welcome to the Live Accessibility Dubber demo.",
-    "This system provides real-time speech-to-text captions",
-    "with support for multiple languages and translation.",
-    "The captions appear with smooth animations",
-    "and automatically scroll as new text arrives.",
-    "You can pause, resume, and adjust the font size",
-    "to ensure optimal accessibility for all users.",
-    "The system uses open-source speech recognition models",
-    "to provide accurate transcription without privacy concerns.",
-    "Thank you for using Live Accessibility Dubber!"
-  ];
-
-  // Simulate live captions
+  // Initialize Speech Recognition
   useEffect(() => {
-    if (!isConnected || isPaused) return;
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      setError('Speech recognition not supported in this browser. Please use Chrome or Edge.');
+      return;
+    }
 
-    let currentIndex = 0;
-    const interval = setInterval(() => {
-      if (currentIndex < mockCaptions.length) {
-        const text = mockCaptions[currentIndex];
+    // Create speech recognition instance
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      setIsListening(true);
+      setError('');
+    };
+
+    recognition.onresult = (event: any) => {
+      let interimTranscript = '';
+      let finalTranscript = '';
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript;
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+
+      if (finalTranscript) {
         const newCaption: CaptionLine = {
           id: `caption-${captionIdRef.current++}`,
-          text,
+          text: finalTranscript,
           timestamp: new Date(),
           isFinal: true,
         };
-
         setCaptions(prev => [...prev, newCaption]);
-        currentIndex++;
-      } else {
-        // Reset and loop
-        currentIndex = 0;
-        setCaptions([]);
+        setCurrentInterim('');
+      } else if (interimTranscript) {
+        setCurrentInterim(interimTranscript);
       }
-    }, 3000);
+    };
 
-    return () => clearInterval(interval);
-  }, [isConnected, isPaused]);
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error:', event.error);
+      setError(`Recognition error: ${event.error}`);
+      setIsListening(false);
+    };
 
-  // Simulate interim captions
+    recognition.onend = () => {
+      setIsListening(false);
+      if (isConnected && !isPaused && !isMuted) {
+        // Restart recognition if it should be running
+        setTimeout(() => {
+          try {
+            recognition.start();
+          } catch (e) {
+            console.log('Recognition restart failed:', e);
+          }
+        }, 100);
+      }
+    };
+
+    recognitionRef.current = recognition;
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, []);
+
+  // Start/stop recognition based on connection and pause state
   useEffect(() => {
-    if (!isConnected || isPaused) return;
+    if (!recognitionRef.current) return;
 
-    const interimTexts = [
-      "Processing audio...",
-      "Analyzing speech patterns...",
-      "Generating captions...",
-      ""
-    ];
-
-    let interimIndex = 0;
-    const interimInterval = setInterval(() => {
-      setCurrentInterim(interimTexts[interimIndex]);
-      interimIndex = (interimIndex + 1) % interimTexts.length;
-    }, 1500);
-
-    return () => clearInterval(interimInterval);
-  }, [isConnected, isPaused]);
+    if (isConnected && !isPaused && !isMuted) {
+      if (!isListening) {
+        try {
+          recognitionRef.current.start();
+        } catch (e) {
+          console.log('Recognition already started');
+        }
+      }
+    } else {
+      if (isListening) {
+        recognitionRef.current.stop();
+      }
+    }
+  }, [isConnected, isPaused, isMuted, isListening]);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -92,100 +130,169 @@ export const LiveCaptionsPanel = ({ isConnected, fontSize }: LiveCaptionsPanelPr
     }
   }, [captions, isPaused]);
 
-  return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="pb-4">
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            🎤 Live Captions
-            {isConnected && (
-              <Badge variant="secondary" className="bg-success text-success-foreground">
-                Live
-              </Badge>
-            )}
-          </CardTitle>
-          
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsMuted(!isMuted)}
-              disabled={!isConnected}
-            >
-              {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-            </Button>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsPaused(!isPaused)}
-              disabled={!isConnected}
-            >
-              {isPaused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
-              {isPaused ? 'Resume' : 'Pause'}
-            </Button>
-          </div>
-        </div>
-      </CardHeader>
+  const handleMicToggle = () => {
+    setIsMuted(!isMuted);
+  };
 
-      <CardContent className="flex-1 flex flex-col min-h-0">
-        {!isConnected ? (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center space-y-4">
-              <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto"></div>
-              <p className="text-muted-foreground">Connecting to live captions...</p>
+  const handlePauseToggle = () => {
+    setIsPaused(!isPaused);
+  };
+
+  const clearCaptions = () => {
+    setCaptions([]);
+    setCurrentInterim('');
+  };
+
+  return (
+    <div className="relative h-full">
+      {/* AI Background Animation */}
+      <div className="absolute inset-0 overflow-hidden rounded-lg">
+        <div className="ai-background-grid"></div>
+        <div className="ai-neural-network"></div>
+      </div>
+      
+      <Card className="h-full flex flex-col relative z-10 bg-card/80 backdrop-blur-sm border-primary/20">
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-3">
+              <div className="relative">
+                <Brain className="w-6 h-6 text-primary animate-pulse" />
+                <Zap className="w-3 h-3 text-accent absolute -top-1 -right-1 animate-bounce" />
+              </div>
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                Live AI Captions
+              </span>
+              {isConnected && isListening && (
+                <Badge variant="secondary" className="bg-success text-success-foreground animate-pulse">
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-success-foreground rounded-full animate-ping"></div>
+                    Live
+                  </div>
+                </Badge>
+              )}
+            </CardTitle>
+            
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleMicToggle}
+                disabled={!isConnected}
+                className={`${isMuted ? 'bg-destructive/10 border-destructive' : 'bg-success/10 border-success'}`}
+              >
+                {isMuted ? (
+                  <MicOff className="w-4 h-4 text-destructive" />
+                ) : (
+                  <Mic className={`w-4 h-4 text-success ${isListening ? 'animate-pulse' : ''}`} />
+                )}
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePauseToggle}
+                disabled={!isConnected}
+              >
+                {isPaused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
+                {isPaused ? 'Resume' : 'Pause'}
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={clearCaptions}
+                disabled={!isConnected || captions.length === 0}
+              >
+                Clear
+              </Button>
             </div>
           </div>
-        ) : (
-          <div 
-            ref={scrollRef}
-            className="flex-1 space-y-3 overflow-y-auto scrollbar-hide pr-2"
-            style={{ fontSize: `${fontSize}px` }}
-          >
-            {captions.map((caption) => (
-              <div
-                key={caption.id}
-                className={`caption-fade-in p-3 rounded-lg ${
-                  caption.isFinal 
-                    ? 'bg-caption-bg text-caption-text caption-final' 
-                    : 'bg-muted text-muted-foreground caption-interim'
-                }`}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <p className="flex-1 leading-relaxed">
-                    {caption.text}
-                  </p>
-                  <span className="text-xs opacity-60 whitespace-nowrap">
-                    {caption.timestamp.toLocaleTimeString()}
-                  </span>
-                </div>
-              </div>
-            ))}
-            
-            {/* Interim caption */}
-            {currentInterim && (
-              <div className="p-3 rounded-lg bg-muted text-muted-foreground caption-interim animate-pulse">
-                <p className="leading-relaxed">{currentInterim}</p>
-              </div>
-            )}
-            
-            {/* Scroll indicator */}
-            <div className="h-1"></div>
-          </div>
-        )}
+        </CardHeader>
 
-        {/* Status bar */}
-        <div className="mt-4 pt-4 border-t border-border">
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <span>
-              {captions.length} captions • {isPaused ? 'Paused' : 'Live'}
-            </span>
-            <span>
-              Font size: {fontSize}px
-            </span>
+        <CardContent className="flex-1 flex flex-col min-h-0">
+          {error && (
+            <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+              <p className="text-destructive text-sm">{error}</p>
+            </div>
+          )}
+
+          {!isConnected ? (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center space-y-4">
+                <div className="relative">
+                  <div className="animate-spin w-12 h-12 border-2 border-primary border-t-transparent rounded-full mx-auto"></div>
+                  <Brain className="w-6 h-6 text-primary absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse" />
+                </div>
+                <p className="text-muted-foreground">Initializing AI Speech Recognition...</p>
+              </div>
+            </div>
+          ) : (
+            <div 
+              ref={scrollRef}
+              className="flex-1 space-y-3 overflow-y-auto scrollbar-hide pr-2"
+              style={{ fontSize: `${fontSize}px` }}
+            >
+              {captions.length === 0 && !currentInterim && (
+                <div className="flex items-center justify-center h-32 text-muted-foreground">
+                  <div className="text-center space-y-2">
+                    <Mic className="w-8 h-8 mx-auto animate-pulse" />
+                    <p>Start speaking to see live captions...</p>
+                  </div>
+                </div>
+              )}
+
+              {captions.map((caption) => (
+                <div
+                  key={caption.id}
+                  className="caption-fade-in p-4 rounded-lg bg-gradient-to-r from-card to-card/50 border border-primary/10 shadow-sm hover:shadow-md transition-all duration-300"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="flex-1 leading-relaxed text-foreground">
+                      {caption.text}
+                    </p>
+                    <span className="text-xs opacity-60 whitespace-nowrap">
+                      {caption.timestamp.toLocaleTimeString()}
+                    </span>
+                  </div>
+                </div>
+              ))}
+              
+              {/* Interim caption */}
+              {currentInterim && (
+                <div className="p-4 rounded-lg bg-gradient-to-r from-muted/50 to-primary/5 border border-primary/20 caption-interim animate-pulse">
+                  <div className="flex items-center gap-2">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    </div>
+                    <p className="leading-relaxed text-muted-foreground italic">{currentInterim}</p>
+                  </div>
+                </div>
+              )}
+              
+              <div className="h-1"></div>
+            </div>
+          )}
+
+          {/* Enhanced Status bar */}
+          <div className="mt-4 pt-4 border-t border-border/50">
+            <div className="flex items-center justify-between text-sm text-muted-foreground">
+              <div className="flex items-center gap-4">
+                <span className="flex items-center gap-1">
+                  <div className={`w-2 h-2 rounded-full ${isListening ? 'bg-success animate-pulse' : 'bg-muted'}`}></div>
+                  {captions.length} captions
+                </span>
+                <span>{isPaused ? '⏸️ Paused' : isListening ? '🎤 Listening' : '⏹️ Stopped'}</span>
+              </div>
+              <span className="flex items-center gap-2">
+                <Zap className="w-3 h-3" />
+                AI Enhanced • {fontSize}px
+              </span>
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 };

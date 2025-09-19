@@ -149,7 +149,55 @@ All colors MUST be HSL.
 }
 
 @layer components {
-  /* Caption animations */
+  /* AI Background Effects */
+  .ai-background-grid {
+    background-image: 
+      linear-gradient(90deg, hsl(var(--primary) / 0.1) 1px, transparent 1px),
+      linear-gradient(hsl(var(--primary) / 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+    animation: grid-move 20s linear infinite;
+  }
+  
+  .ai-neural-network {
+    background-image: radial-gradient(circle at 25% 25%, hsl(var(--accent) / 0.2) 1px, transparent 1px),
+                      radial-gradient(circle at 75% 75%, hsl(var(--primary) / 0.2) 1px, transparent 1px);
+    background-size: 30px 30px;
+    animation: neural-pulse 3s ease-in-out infinite;
+  }
+  
+  .ai-dots-pattern {
+    background-image: radial-gradient(circle, hsl(var(--primary) / 0.3) 1px, transparent 1px);
+    background-size: 15px 15px;
+    animation: dots-float 8s ease-in-out infinite;
+  }
+
+  /* Animation keyframes */
+  @keyframes grid-move {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(20px, 20px); }
+  }
+  
+  @keyframes neural-pulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.05); }
+  }
+  
+  @keyframes dots-float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  @keyframes gradient-rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  @keyframes gradient-x {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  /* Enhanced caption animations */
   .caption-fade-in {
     @apply animate-[fadeInUp_0.3s_ease-out];
   }
@@ -186,7 +234,7 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
-  /* Gradient backgrounds */
+  /* Gradient animations */
   .gradient-primary {
     background: var(--gradient-primary);
   }
@@ -197,6 +245,16 @@ All colors MUST be HSL.
   
   .gradient-subtle {
     background: var(--gradient-subtle);
+  }
+  
+  /* AI-themed animations */
+  .animate-gradient-x {
+    background-size: 400% 400%;
+    animation: gradient-x 3s ease infinite;
+  }
+  
+  .animate-gradient-rotate {
+    animation: gradient-rotate 3s linear infinite;
   }
   
   /* Caption specific utilities */
