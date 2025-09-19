@@ -2,41 +2,63 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+/* Live Accessibility Dubber Design System
 All colors MUST be HSL.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 240 10% 98%;
+    --foreground: 240 10% 4%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 240 10% 4%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 240 10% 4%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Accessibility-first color palette */
+    --primary: 240 100% 12%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 10% 4%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 142 76% 36%;
+    --accent-foreground: 0 0% 100%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Status colors */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 240 100% 12%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Live caption specific colors */
+    --caption-bg: 240 100% 12%;
+    --caption-text: 0 0% 100%;
+    --caption-interim: 240 5% 64%;
+    
+    /* Panel colors */
+    --panel-active: 240 100% 12%;
+    --panel-inactive: 240 4% 46%;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(240 100% 12%), hsl(260 100% 20%));
+    --gradient-accent: linear-gradient(135deg, hsl(142 76% 36%), hsl(122 76% 40%));
+    --gradient-subtle: linear-gradient(180deg, hsl(240 10% 98%), hsl(240 6% 96%));
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -56,33 +78,55 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 240 10% 4%;
+    --foreground: 0 0% 98%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 240 8% 8%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 240 8% 8%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* Dark mode accessibility colors */
+    --primary: 240 100% 85%;
+    --primary-foreground: 240 10% 4%;
+    
+    --secondary: 240 6% 16%;
+    --secondary-foreground: 0 0% 98%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --muted: 240 6% 16%;
+    --muted-foreground: 240 4% 64%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 142 76% 60%;
+    --accent-foreground: 240 10% 4%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    /* Dark status colors */
+    --success: 142 76% 60%;
+    --success-foreground: 240 10% 4%;
+    
+    --warning: 38 92% 70%;
+    --warning-foreground: 240 10% 4%;
+    
+    --destructive: 0 84% 70%;
+    --destructive-foreground: 240 10% 4%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --border: 240 6% 16%;
+    --input: 240 6% 16%;
+    --ring: 240 100% 85%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    /* Dark caption colors */
+    --caption-bg: 240 8% 8%;
+    --caption-text: 0 0% 98%;
+    --caption-interim: 240 4% 64%;
+    
+    /* Dark panel colors */
+    --panel-active: 240 100% 85%;
+    --panel-inactive: 240 4% 64%;
+    
+    /* Dark gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(240 8% 8%), hsl(260 10% 12%));
+    --gradient-accent: linear-gradient(135deg, hsl(142 76% 60%), hsl(122 76% 55%));
+    --gradient-subtle: linear-gradient(180deg, hsl(240 10% 4%), hsl(240 8% 6%));
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -101,5 +145,71 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  /* Caption animations */
+  .caption-fade-in {
+    @apply animate-[fadeInUp_0.3s_ease-out];
+  }
+  
+  .caption-interim {
+    @apply opacity-60 italic;
+  }
+  
+  .caption-final {
+    @apply opacity-100 font-medium;
+  }
+  
+  /* Panel transitions */
+  .panel-slide-in {
+    @apply animate-[slideInRight_0.4s_ease-out];
+  }
+  
+  .panel-slide-out {
+    @apply animate-[slideOutRight_0.3s_ease-in];
+  }
+  
+  /* Status indicators */
+  .status-connected {
+    @apply bg-success text-success-foreground animate-pulse;
+  }
+  
+  .status-disconnected {
+    @apply bg-destructive text-destructive-foreground;
+  }
+  
+  .status-connecting {
+    @apply bg-warning text-warning-foreground animate-spin;
+  }
+}
+
+@layer utilities {
+  /* Gradient backgrounds */
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .gradient-accent {
+    background: var(--gradient-accent);
+  }
+  
+  .gradient-subtle {
+    background: var(--gradient-subtle);
+  }
+  
+  /* Caption specific utilities */
+  .caption-container {
+    @apply bg-caption-bg text-caption-text p-4 rounded-lg shadow-lg;
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }

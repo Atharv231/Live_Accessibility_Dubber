@@ -47,6 +47,20 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Live Accessibility Dubber specific colors
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        "caption-bg": "hsl(var(--caption-bg))",
+        "caption-text": "hsl(var(--caption-text))",
+        "caption-interim": "hsl(var(--caption-interim))",
+        "panel-active": "hsl(var(--panel-active))",
+        "panel-inactive": "hsl(var(--panel-inactive))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -80,10 +94,53 @@ export default {
             height: "0",
           },
         },
+        // Live Accessibility Dubber animations
+        "fadeInUp": {
+          "0%": {
+            opacity: "0",
+            transform: "translateY(10px)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
+        "slideInRight": {
+          "0%": {
+            opacity: "0",
+            transform: "translateX(20px)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateX(0)",
+          },
+        },
+        "slideOutRight": {
+          "0%": {
+            opacity: "1",
+            transform: "translateX(0)",
+          },
+          "100%": {
+            opacity: "0",
+            transform: "translateX(20px)",
+          },
+        },
+        "pulse": {
+          "0%, 100%": {
+            opacity: "1",
+          },
+          "50%": {
+            opacity: "0.7",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fadeInUp": "fadeInUp 0.3s ease-out",
+        "slideInRight": "slideInRight 0.4s ease-out",
+        "slideOutRight": "slideOutRight 0.3s ease-in",
+        "pulse": "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
     },
   },
