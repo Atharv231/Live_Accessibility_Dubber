@@ -149,7 +149,7 @@ All colors MUST be HSL.
 }
 
 @layer components {
-/* Enhanced AI Background Effects */
+  /* AI Background Effects */
   .ai-background-grid {
     background-image: 
       linear-gradient(90deg, hsl(var(--primary) / 0.1) 1px, transparent 1px),
@@ -159,12 +159,9 @@ All colors MUST be HSL.
   }
   
   .ai-neural-network {
-    background-image: 
-      radial-gradient(circle at 25% 25%, hsl(var(--accent) / 0.2) 1px, transparent 1px),
-      radial-gradient(circle at 75% 75%, hsl(var(--primary) / 0.2) 1px, transparent 1px),
-      radial-gradient(circle at 50% 10%, hsl(var(--accent) / 0.1) 2px, transparent 2px),
-      radial-gradient(circle at 10% 90%, hsl(var(--primary) / 0.15) 1px, transparent 1px);
-    background-size: 30px 30px, 40px 40px, 25px 25px, 35px 35px;
+    background-image: radial-gradient(circle at 25% 25%, hsl(var(--accent) / 0.2) 1px, transparent 1px),
+                      radial-gradient(circle at 75% 75%, hsl(var(--primary) / 0.2) 1px, transparent 1px);
+    background-size: 30px 30px;
     animation: neural-pulse 3s ease-in-out infinite;
   }
   
@@ -172,16 +169,6 @@ All colors MUST be HSL.
     background-image: radial-gradient(circle, hsl(var(--primary) / 0.3) 1px, transparent 1px);
     background-size: 15px 15px;
     animation: dots-float 8s ease-in-out infinite;
-  }
-
-  /* Floating AI particles */
-  .ai-particles {
-    background-image: 
-      radial-gradient(circle at 20% 80%, hsl(var(--accent) / 0.3) 2px, transparent 2px),
-      radial-gradient(circle at 80% 20%, hsl(var(--primary) / 0.25) 1px, transparent 1px),
-      radial-gradient(circle at 40% 40%, hsl(var(--accent) / 0.2) 1px, transparent 1px);
-    background-size: 60px 60px, 45px 45px, 30px 30px;
-    animation: particles-drift 15s ease-in-out infinite;
   }
 
   /* Animation keyframes */
@@ -196,14 +183,8 @@ All colors MUST be HSL.
   }
   
   @keyframes dots-float {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-10px) rotate(180deg); }
-  }
-
-  @keyframes particles-drift {
-    0%, 100% { transform: translate(0, 0) rotate(0deg); }
-    33% { transform: translate(-10px, -15px) rotate(120deg); }
-    66% { transform: translate(10px, -5px) rotate(240deg); }
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
   }
   
   @keyframes gradient-rotate {
@@ -216,59 +197,39 @@ All colors MUST be HSL.
     50% { background-position: 100% 50%; }
   }
 
-  @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 20px hsl(var(--primary) / 0.3); }
-    50% { box-shadow: 0 0 30px hsl(var(--primary) / 0.6), 0 0 60px hsl(var(--accent) / 0.2); }
-  }
-
   /* Enhanced caption animations */
   .caption-fade-in {
-    @apply animate-[fadeInUp_0.5s_ease-out];
-    animation-fill-mode: both;
+    @apply animate-[fadeInUp_0.3s_ease-out];
   }
   
   .caption-interim {
     @apply opacity-60 italic;
-    animation: pulse-subtle 1.5s ease-in-out infinite;
   }
   
   .caption-final {
     @apply opacity-100 font-medium;
-    animation: glow-in 0.3s ease-out;
-  }
-
-  .caption-translating {
-    @apply bg-gradient-to-r from-accent/10 to-primary/10 border-accent/30;
-    animation: shimmer 2s ease-in-out infinite;
   }
   
   /* Panel transitions */
   .panel-slide-in {
-    @apply animate-[slideInRight_0.5s_ease-out];
+    @apply animate-[slideInRight_0.4s_ease-out];
   }
   
   .panel-slide-out {
-    @apply animate-[slideOutRight_0.4s_ease-in];
+    @apply animate-[slideOutRight_0.3s_ease-in];
   }
   
   /* Status indicators */
   .status-connected {
-    @apply bg-success text-success-foreground;
-    animation: pulse-glow 2s ease-in-out infinite;
+    @apply bg-success text-success-foreground animate-pulse;
   }
   
   .status-disconnected {
-    @apply bg-destructive text-destructive-foreground animate-pulse;
+    @apply bg-destructive text-destructive-foreground;
   }
   
   .status-connecting {
-    @apply bg-warning text-warning-foreground;
-    animation: rotate-pulse 1s ease-in-out infinite;
-  }
-
-  .translation-indicator {
-    @apply bg-gradient-to-r from-accent/20 to-primary/20 text-foreground;
-    animation: gradient-shift 3s ease-in-out infinite;
+    @apply bg-warning text-warning-foreground animate-spin;
   }
 }
 
@@ -295,62 +256,10 @@ All colors MUST be HSL.
   .animate-gradient-rotate {
     animation: gradient-rotate 3s linear infinite;
   }
-
-  /* New animation keyframes */
-  @keyframes fadeInUp {
-    0% {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes pulse-subtle {
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 0.8; }
-  }
-
-  @keyframes glow-in {
-    0% {
-      opacity: 0;
-      text-shadow: 0 0 10px hsl(var(--accent) / 0.5);
-    }
-    100% {
-      opacity: 1;
-      text-shadow: none;
-    }
-  }
-
-  @keyframes shimmer {
-    0%, 100% { background-position: -200% 0; }
-    50% { background-position: 200% 0; }
-  }
-
-  @keyframes rotate-pulse {
-    0% { transform: rotate(0deg) scale(1); }
-    50% { transform: rotate(180deg) scale(1.1); }
-    100% { transform: rotate(360deg) scale(1); }
-  }
-
-  @keyframes gradient-shift {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-  }
   
   /* Caption specific utilities */
   .caption-container {
     @apply bg-caption-bg text-caption-text p-4 rounded-lg shadow-lg;
-  }
-
-  .glass-effect {
-    @apply bg-card/80 backdrop-blur-sm border-primary/20;
-  }
-
-  .ai-glow {
-    box-shadow: 0 0 20px hsl(var(--primary) / 0.2), inset 0 0 20px hsl(var(--accent) / 0.05);
   }
   
   .scrollbar-hide {
