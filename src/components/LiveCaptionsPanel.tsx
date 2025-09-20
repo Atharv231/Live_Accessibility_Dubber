@@ -2,8 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Play, Pause, Volume2, VolumeX, Mic, MicOff, Brain, Zap, Languages, Globe } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Mic, MicOff, Brain, Zap } from 'lucide-react';
 
 interface CaptionLine {
   id: string;
@@ -17,24 +16,6 @@ interface LiveCaptionsPanelProps {
   fontSize: number;
 }
 
-const SUPPORTED_LANGUAGES = [
-  { code: 'en-US', name: 'English (US)', flag: '🇺🇸' },
-  { code: 'en-GB', name: 'English (UK)', flag: '🇬🇧' },
-  { code: 'es-ES', name: 'Spanish', flag: '🇪🇸' },
-  { code: 'fr-FR', name: 'French', flag: '🇫🇷' },
-  { code: 'de-DE', name: 'German', flag: '🇩🇪' },
-  { code: 'it-IT', name: 'Italian', flag: '🇮🇹' },
-  { code: 'pt-BR', name: 'Portuguese', flag: '🇧🇷' },
-  { code: 'ru-RU', name: 'Russian', flag: '🇷🇺' },
-  { code: 'ja-JP', name: 'Japanese', flag: '🇯🇵' },
-  { code: 'ko-KR', name: 'Korean', flag: '🇰🇷' },
-  { code: 'zh-CN', name: 'Chinese', flag: '🇨🇳' },
-  { code: 'ar-SA', name: 'Arabic', flag: '🇸🇦' },
-  { code: 'hi-IN', name: 'Hindi', flag: '🇮🇳' },
-  { code: 'nl-NL', name: 'Dutch', flag: '🇳🇱' },
-  { code: 'sv-SE', name: 'Swedish', flag: '🇸🇪' },
-];
-
 export const LiveCaptionsPanel = ({ isConnected, fontSize }: LiveCaptionsPanelProps) => {
   const [captions, setCaptions] = useState<CaptionLine[]>([]);
   const [isPaused, setIsPaused] = useState(false);
@@ -42,7 +23,6 @@ export const LiveCaptionsPanel = ({ isConnected, fontSize }: LiveCaptionsPanelPr
   const [isListening, setIsListening] = useState(false);
   const [currentInterim, setCurrentInterim] = useState<string>('');
   const [error, setError] = useState<string>('');
-  const [selectedLanguage, setSelectedLanguage] = useState('en-US');
   const scrollRef = useRef<HTMLDivElement>(null);
   const captionIdRef = useRef(0);
   const recognitionRef = useRef<any>(null);
@@ -60,7 +40,7 @@ export const LiveCaptionsPanel = ({ isConnected, fontSize }: LiveCaptionsPanelPr
     
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = selectedLanguage;
+    recognition.lang = 'en-US';
     recognition.maxAlternatives = 1;
 
     recognition.onstart = () => {
@@ -122,7 +102,7 @@ export const LiveCaptionsPanel = ({ isConnected, fontSize }: LiveCaptionsPanelPr
         recognitionRef.current.stop();
       }
     };
-  }, [selectedLanguage]); // Restart recognition when language changes
+  }, []);
 
   // Start/stop recognition based on connection and pause state
   useEffect(() => {
@@ -163,14 +143,6 @@ export const LiveCaptionsPanel = ({ isConnected, fontSize }: LiveCaptionsPanelPr
     setCurrentInterim('');
   };
 
-  const handleLanguageChange = (newLanguage: string) => {
-    setSelectedLanguage(newLanguage);
-    // Stop current recognition if running
-    if (recognitionRef.current && isListening) {
-      recognitionRef.current.stop();
-    }
-  };
-
   return (
     <div className="relative h-full">
       {/* AI Background Animation */}
@@ -201,26 +173,6 @@ export const LiveCaptionsPanel = ({ isConnected, fontSize }: LiveCaptionsPanelPr
             </CardTitle>
             
             <div className="flex items-center gap-2">
-              {/* Language Selector */}
-              <Select value={selectedLanguage} onValueChange={handleLanguageChange}>
-                <SelectTrigger className="w-auto min-w-[140px] h-9 bg-card/50 border-primary/20">
-                  <div className="flex items-center gap-2">
-                    <Globe className="w-4 h-4 text-primary" />
-                    <SelectValue />
-                  </div>
-                </SelectTrigger>
-                <SelectContent className="max-h-60">
-                  {SUPPORTED_LANGUAGES.map((lang) => (
-                    <SelectItem key={lang.code} value={lang.code}>
-                      <div className="flex items-center gap-2">
-                        <span>{lang.flag}</span>
-                        <span>{lang.name}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
               <Button
                 variant="outline"
                 size="sm"
